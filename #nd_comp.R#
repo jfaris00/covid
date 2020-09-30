@@ -1,0 +1,23 @@
+
+rm(list = ls())
+library(tidyverse)
+library(lubridate)
+
+state.data <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv")
+dates <- colnames(state.data)[12:length(state.data)] %>% mdy %>% as.Date
+
+data.summ <- state.data %>%
+    select(-c(Lat, Long_, Combined_Key, UID, iso2, iso3, code3, FIPS, Admin2, Country_Region)) %>%
+    group_by(`Province_State`) %>%
+    summarize_if(is.numeric, sum)
+
+states <- data.summ$`Province_State`
+
+data.transpose <- data.summ %>%
+    select(-`Province_State`) %>%
+    as.matrix %>%
+    t %>%
+    as.data.frame %>%
+    as_tibble
+
+colnames(data.transpose)  <-  states

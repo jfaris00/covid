@@ -1,0 +1,22 @@
+from urllib.request import urlopen
+import pandas as pd
+from datetime import datetime
+import numpy as np
+
+import_data = False
+if(import_data == True):
+    country_data_link = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+    f = urlopen(country_data_link)
+    covid_data = f.read()
+    s = str(covid_data, 'utf-8')
+    file = open("data.txt", "w")
+    file.write(s)
+
+df = pd.read_csv('data.txt')
+
+dates = pd.to_datetime(list(df.columns)[4:len(df.columns)])
+
+covid_filtered=df.drop(['Lat', 'Long'], axis = 1) .groupby('Country/Region').aggregate(np.sum)
+
+countries = covid_filtered['Country/Region']
+
